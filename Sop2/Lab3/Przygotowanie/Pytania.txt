@@ -1,0 +1,3 @@
+1. Jak to zrobić, żeby klient też trwał przez dłuższy czas?
+2. Jak to potem sprawdzić?
+3. Jak wykryć, że klienta trzeba usunąć?
