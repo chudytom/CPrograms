@@ -60,7 +60,7 @@ int tryDeleteClient(int clientId)
 
 void prepareFullErrorMessage(int32_t *data)
 {
-    data[0] = 'F';
+    data[0] = htonl('F');
     data[1] = 0;
     data[2] = 0;
 }
@@ -127,7 +127,7 @@ void prepareClientsTable(int n)
 
 void displayAllClients()
 {
-    for (int i=0; i< MAX_CLIENT; i++)
+    for (int i = 0; i < MAX_CLIENT; i++)
     {
         printf("Client number %d: %d %d %d\n", i, clients[i].fd, clients[i].id, clients[i].L);
     }
@@ -159,6 +159,13 @@ void doServer(int fdT, fd_set *base_rfds)
                 displayAllClients();
                 int addedClientId = tryAddClient(&newClient);
                 displayAllClients();
+                if (-1 == addedClientId)
+                {
+                    int32_t *data = malloc(sizeof(int32_t[MESSAGE_SIZE]));
+                    prepareFullErrorMessage(data);
+                    if (bulk_write(cfd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < 0 && errno != EPIPE)
+                        ERR("write:");
+                }
                 printf("Id of an added client %d. Its fd %d\n", addedClientId, cfd);
                 if (addedClientId >= 0)
                 {
