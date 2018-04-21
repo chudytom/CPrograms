@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <time.h>
 
 char* concat(const char* s1, const char* s2);
 char* convertToCapital(const char* text);
@@ -37,7 +38,7 @@ int make_tcp_socket_client(void);
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]));
 #define ERR(source) (perror(source),\
-					fprintf(stderr, "%s:%d\n", __FILE__, __LINE__),\
+					fprintf(stderr, "eror: %s:%d\n", __FILE__, __LINE__),\
 					exit(EXIT_FAILURE))
 
 #define BACKLOG 3

@@ -50,17 +50,29 @@ void prepareStartMessage(int32_t *data)
     data[2] = 3;
 }
 
+void prepareNumberMessage(int32_t * data)
+{
+    data[0] = htonl('N');
+    data[1] = getpid();
+    srand(time(NULL));
+    int randomNumber = rand();
+    data[2] = randomNumber;
+}
+
 void doClient(int fd)
 {
-    char *data = malloc(sizeof(int32_t[MESSAGE_SIZE]));
+    int32_t *data = malloc(sizeof(int32_t[MESSAGE_SIZE]));
     prepareStartMessage(data);
     if (bulk_write(fd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < 0)
         ERR("write:");
     while (do_work)
     {
-        // if(bulk_write(fd,(char *)data,sizeof(int32_t[MESSAGE_SIZE]))<0) ERR("write:");
+        sleep(2);
+        prepareNumberMessage(data);
+        if(bulk_write(fd,(char *)data,sizeof(int32_t[MESSAGE_SIZE]))<0) ERR("write:");
         if (bulk_read(fd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < (int)sizeof(int32_t[MESSAGE_SIZE]))
-            ERR("read:");
+            printf("Message read %c %d %d\n", (char)htonl(data[0]), (char)htonl(data[1]), (char)htonl(data[2]));
+            // printf("Something else");
         resolveMessage(data);
     }
 }
@@ -68,13 +80,12 @@ void doClient(int fd)
 int main(int argc, char **argv)
 {
     int fd;
-    int32_t data[MESSAGE_SIZE];
+    // int32_t data[MESSAGE_SIZE];
     if (argc != ARGUMENTS_COUNT)
     {
         usage(argv[0]);
         return EXIT_FAILURE;
     }
-
     if (sethandler(SIG_IGN, SIGPIPE))
         ERR("Seting SIGPIPE:");
     if (sethandler(sigint_handler, SIGINT))

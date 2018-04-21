@@ -1,3 +1,33 @@
-1. Jak to zrobić, żeby klient też trwał przez dłuższy czas?
-2. Jak to potem sprawdzić?
-3. Jak wykryć, że klienta trzeba usunąć?
+1. Do czego używany jest & na końcu? Jak najlepiej odpalać klientów?
+Włączamy apkę w tle, więc często się przyda dla kilku aplikacji w jednym terminalu
+Jeżeli mamy apke w tle to możemy do niej wejśc przez %1. Wychodzimy z niej przez ctrl+z i potem 
+odpalamy fg lub bg, żeby uruchomić proces z powrotem. 
+
+2. Jak to zrobić, żeby klient też trwał przez dłuższy czas?
+Były duże błędy jeśli chodzi o architekture serwera. W rozwiązaniu z tutorialu był taki problem,
+że serwer mógł przyjmować tylko 1 klienta. Trzeba to zmienić i podawać mu różnych klientów w rfds
+Nie jestem pewien czy tylko tu. Ważna rzecz, dla każdego klienta musze zapisać fdsa, bo inaczej
+mój serwer nie będzie wiedział skąd czytać dane.
+3. Jak to potem sprawdzić?
+Fajną możliwością do sprawdzania jest jobs. A nie tylko ps -f.
+4. Jak wykryć, że klienta trzeba usunąć?
+Usuwanie klienta jest realizowane w ten sposób, że po rozłączeniu połączenia wysyła on 0 bajtów. 
+Trzeba to obslużyć i:
+- usunąć klienta z mojej tablicy
+- usunąć klienta z rfds (w sumie najlepiej z baze i potem sobie z niego kopiować za każdym razem)
+- zamknąć fdsa
+5. Jak dokładnie działa ten SetHandler
+SetHandler w uproszczeniu ustawia nam funkcję, która się wykona po przyjściu konkretnego sygnału.
+Można też wrzucić ignorowanie sygnału, jak na przykład dla SIGPIPE
+6. Dlaczego może mi nie działać intellisens na komputerze wydziałowym
+Już naprawiony. Tylko ten Microsoftowy. Trochę trzeba poczekać aż się załaduje.
+W razie czego restart albo wyłączenie niedziałającego pliku.  
+7. Jak zrobić sleepa przez pół sekundy?
+Używamy nanosleep i podajemy mu timespec. W pierwszym polu struktury wpisujemy sekundy, w drugim nanosekundy
+
+
+10. Na co zwrócić uwage przy naastępnym laboratorium?
+Głownie będą sockety i tego muszę się dobrze nauczyć. Dodatkowo powinna być conditional variable
+
+!!! W razie problemow moge podejrzeć kody u Endrju
+
