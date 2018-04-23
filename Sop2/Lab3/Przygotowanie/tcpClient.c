@@ -6,6 +6,7 @@ volatile sig_atomic_t do_work = 1;
 
 void sigint_handler(int sig)
 {
+    printf("Sigint worked\n");
     do_work = 0;
 }
 
@@ -23,7 +24,7 @@ void prepare_request(char **argv, int32_t data[MESSAGE_SIZE])
     data[4] = htonl(1);
 }
 
-void resolveMessage(int32_t data[])
+void resolveMessageFromServer(int32_t data[])
 {
     char message = (char)ntohl(data[0]);
     printf("Character received from server %c\n", message);
@@ -67,13 +68,17 @@ void doClient(int fd)
         ERR("write:");
     while (do_work)
     {
+        printf("Before sleep\n");
         sleep(2);
+        printf("Affter sleep\n");
         prepareNumberMessage(data);
         if(bulk_write(fd,(char *)data,sizeof(int32_t[MESSAGE_SIZE]))<0) ERR("write:");
-        if (bulk_read(fd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < (int)sizeof(int32_t[MESSAGE_SIZE]))
-            printf("Message read %c %d %d\n", (char)htonl(data[0]), (char)htonl(data[1]), (char)htonl(data[2]));
+        printf("After write\n");
+        // if (bulk_read(fd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < (int)sizeof(int32_t[MESSAGE_SIZE]))
+        //     printf("Message read %c %d %d\n", (char)htonl(data[0]), (char)htonl(data[1]), (char)htonl(data[2]));
             // printf("Something else");
-        resolveMessage(data);
+        printf("After read\n");
+        resolveMessageFromServer(data);
     }
 }
 
@@ -92,7 +97,6 @@ int main(int argc, char **argv)
         ERR("Seting SIGINT:");
     fd = connect_tcp_socket(argv[1], argv[2]);
     doClient(fd);
-    // prepare_request(argv,data);
 
     if (TEMP_FAILURE_RETRY(close(fd)) < 0)
         ERR("close");

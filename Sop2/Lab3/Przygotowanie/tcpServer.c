@@ -21,8 +21,9 @@ void usage(char *name)
     fprintf(stderr, "USAGE: %s socket port\n", name);
 }
 
-int tryAddClient(struct Client *newClient)
+int tryAddClient(int cfd)
 {
+
     if (clientsCount >= MAX_CLIENT)
     {
         printf("Too many clients accepted: %d\n", clientsCount);
@@ -32,11 +33,13 @@ int tryAddClient(struct Client *newClient)
     {
         if (-1 == clients[i].id)
         {
-            printf("Client added\n");
+            // struct Client newClient;
+            // newClient.fd = cfd;
             // clients[i] = *newClient;
-            clients[i].id = newClient->id;
-            clients[i].fd = newClient->fd;
+            clients[i].id = i;
+            clients[i].fd = cfd;
             clientsCount++;
+            printf("Client added\n");
             return clients[i].id;
         }
     }
@@ -114,6 +117,8 @@ void sendResponse(int cfd)
         if (result == -1)
             ERR("Did not send response message\n");
     }
+    // if ((size = bulk_read(cfd, (char *)data, sizeof(int32_t[MESSAGE_SIZE]))) < 0)
+    //     ERR("Reading message from sendResponse\n");
     // if (TEMP_FAILURE_RETRY(close(cfd)) < 0)
     //     ERR("close");
 }
@@ -148,33 +153,47 @@ void doServer(int fdT, fd_set *base_rfds)
     sigprocmask(SIG_BLOCK, &mask, &oldmask);
     while (do_work)
     {
+        printf("I am in while\n");
         rfds = *base_rfds;
-        if (pselect(fdT + 1, &rfds, NULL, NULL, NULL, &oldmask) > 0)
+        // for(int i=0; i< MAX_CLIENT; i++)
+        // {
+        //     if(clients[i].id>=0)
+        //     {
+        //         printf("Client detected: %d\n", clients[i].id);
+        //         sendResponse(clients[i].fd);
+        //     }
+        // }
+        if (pselect(FD_SETSIZE, &rfds, NULL, NULL, NULL, &oldmask) > 0)
         {
             //I need to learn how to acutally use pselect() function
-            cfd = add_new_client(fdT); //Here is problably the mistake
-
-            if (cfd > 0)
+            if (FD_ISSET(fdT, &rfds))
             {
-                FD_SET(cfd, base_rfds);
-                // fdT++;
-                struct Client newClient;
-                newClient.fd = cfd;
-                newClient.id = 2; //Wrong id number
-                displayAllClients();
-                int addedClientId = tryAddClient(&newClient);
-                displayAllClients();
-                if (-1 == addedClientId)
+
+                cfd = add_new_client(fdT); //Here is problably the mistake
+
+                if (cfd > 0)
                 {
-                    int32_t *data = malloc(sizeof(int32_t[MESSAGE_SIZE]));
-                    prepareFullErrorMessage(data);
-                    if (bulk_write(cfd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < 0 && errno != EPIPE)
-                        ERR("write:");
+                    printf("Cfd >0\n");
+                    FD_SET(cfd, base_rfds);
+                    // struct Client newClient;
+                    // newClient.fd = cfd;
+                    int addedClientId = tryAddClient(cfd);
+                    displayAllClients();
+                    if (-1 == addedClientId)
+                    {
+                        int32_t *data = malloc(sizeof(int32_t[MESSAGE_SIZE]));
+                        prepareFullErrorMessage(data);
+                        if (bulk_write(cfd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < 0 && errno != EPIPE)
+                            ERR("write:");
+                    }
+                    printf("Id of an added client %d. Its fd %d\n", addedClientId, cfd);
                 }
-                printf("Id of an added client %d. Its fd %d\n", addedClientId, cfd);
-                if (addedClientId >= 0)
+            }
+            for (int i = 0; i < MAX_CLIENT; i++)
+            {
+                if (FD_ISSET(clients[i].fd, &rfds))
                 {
-                    sendResponse(cfd);
+                    sendResponse(clients[i].fd);
                 }
             }
         }

@@ -31,3 +31,9 @@ Głownie będą sockety i tego muszę się dobrze nauczyć. Dodatkowo powinna by
 
 !!! W razie problemow moge podejrzeć kody u Endrju
 
+
+11. Dlaczego serwer nie reaguje na otrzymywane wiadomości. Gdzie powinien być read?
+Jedyne rozwiązanie jakie widzę to w pętli sprawdzanie readem każdego deskryptora
+
+12. Jak sprawdzić czy otrzymana wiadomośc miała 0 bajtów,
+
