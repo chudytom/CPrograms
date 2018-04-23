@@ -65,7 +65,7 @@ void prepareFullErrorMessage(int32_t *data)
     data[2] = 0;
 }
 
-int resolveMessage(int32_t data[MESSAGE_SIZE], int cfd)
+int resolveMessageFromClient(int32_t data[MESSAGE_SIZE], int cfd)
 {
     char message = ntohl(data[0]);
     struct Client *newClient = malloc(sizeof(struct Client));
@@ -93,6 +93,7 @@ int resolveMessage(int32_t data[MESSAGE_SIZE], int cfd)
         break;
     default:
         printf("Unknown message received from server\n");
+        return -1;
     }
     return 0;
 }
@@ -106,13 +107,15 @@ void sendResponse(int cfd)
         ERR("Reading message from sendResponse\n");
     if (size == (int)sizeof(int32_t[MESSAGE_SIZE]))
     {
-        int result = resolveMessage(data, cfd);
-        if (result == -1)
+        int result = resolveMessageFromClient(data, cfd);
+        if (result == 0)
             if (bulk_write(cfd, (char *)data, sizeof(int32_t[MESSAGE_SIZE])) < 0 && errno != EPIPE)
                 ERR("write:");
+        if (result == -1)
+            ERR("Did not send response message\n");
     }
-    if (TEMP_FAILURE_RETRY(close(cfd)) < 0)
-        ERR("close");
+    // if (TEMP_FAILURE_RETRY(close(cfd)) < 0)
+    //     ERR("close");
 }
 
 void prepareClientsTable(int n)
@@ -148,7 +151,9 @@ void doServer(int fdT, fd_set *base_rfds)
         rfds = *base_rfds;
         if (pselect(fdT + 1, &rfds, NULL, NULL, NULL, &oldmask) > 0)
         {
-            cfd = add_new_client(fdT);
+            //I need to learn how to acutally use pselect() function
+            cfd = add_new_client(fdT); //Here is problably the mistake
+
             if (cfd > 0)
             {
                 FD_SET(cfd, base_rfds);
