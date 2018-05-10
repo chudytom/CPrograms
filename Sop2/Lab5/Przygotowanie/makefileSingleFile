@@ -1,0 +1,9 @@
+all: readWrite
+strings_example: strings-example.c
+	gcc -Wall -o strings-example  strings-example.c
+readWrite: readWrite.o soplib.o
+	gcc -Wall -o readWrite readWrite.o soplib.o -lm -lrt
+readWrite.o: readWrite.c soplib.h
+	gcc -Wall -o readWrite.o -c readWrite.c
+soplib.o: soplib.c soplib.h
+	gcc -Wall -o soplib.o -c soplib.c
