@@ -1,11 +1,11 @@
 CLIENT = fifoClient
-SERVER = pipeExample
+SERVER = fifoServer
 
 CLIENT.O = fifoClient.o
-SERVER.O = pipeExample.o
+SERVER.O = fifoServer.o
 
 CLIENT.C = fifoClient.c
-SERVER.C = pipeExample.c
+SERVER.C = fifoServer.c
 
 TARGET = ${SERVER} ${CLIENT}
 FILES = ${TARGET} ${SERVER.O} ${CLIENT.O} soplib.o
