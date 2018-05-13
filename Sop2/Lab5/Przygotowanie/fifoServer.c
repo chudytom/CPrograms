@@ -1,12 +1,4 @@
-// #include <unistd.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <errno.h>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <fcntl.h>
-// #include <ctype.h>
-
+#define _GNU_SOURCE
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
