@@ -1,11 +1,11 @@
-CLIENT = fifoClient
-SERVER = lab5
+CLIENT = tcpClient
+SERVER = tcpServer
 
-CLIENT.O = fifoClient.o
-SERVER.O = lab5.o
+CLIENT.O = tcpClient.o
+SERVER.O = tcpServer.o
 
-CLIENT.C = fifoClient.c
-SERVER.C = lab5.c
+CLIENT.C = tcpClient.c
+SERVER.C = tcpServer.c
 
 TARGET = ${SERVER} ${CLIENT}
 FILES = ${TARGET} ${SERVER.O} ${CLIENT.O} soplib.o

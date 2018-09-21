@@ -1,11 +1,11 @@
-CLIENT = fifoClient
-SERVER = lab5
+CLIENT = udpClient
+SERVER = udpServer
 
-CLIENT.O = fifoClient.o
-SERVER.O = lab5.o
+CLIENT.O = udpClient.o
+SERVER.O = udpServer.o
 
-CLIENT.C = fifoClient.c
-SERVER.C = lab5.c
+CLIENT.C = udpClient.c
+SERVER.C = udpServer.c
 
 TARGET = ${SERVER} ${CLIENT}
 FILES = ${TARGET} ${SERVER.O} ${CLIENT.O} soplib.o
@@ -14,9 +14,9 @@ FILES_CLIENT = ${CLIENT.O} soplib.o
 
 all: ${TARGET}
 ${SERVER}: ${FILES_SERVER}
-	gcc -Wall -o ${SERVER} ${FILES_SERVER} -lm -lrt
+	gcc -Wall -o ${SERVER} ${FILES_SERVER} -lm -lrt -pthread
 ${CLIENT}: ${FILES_CLIENT}
-	gcc -Wall -o ${CLIENT} ${FILES_CLIENT} -lm -lrt
+	gcc -Wall -o ${CLIENT} ${FILES_CLIENT} -lm -lrt -pthread
 ${SERVER.O}: ${SERVER.C} soplib.h
 	gcc -Wall -o ${SERVER.O} -c ${SERVER.C} -lm -lrt
 ${CLIENT.O}: ${CLIENT.C} soplib.h
